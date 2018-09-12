@@ -86,13 +86,14 @@ def sendconso(fromaddr, toaddr, ccaddr, consolfile, countrycode):
     serverhost = 'ceicdata-com.mail.protection.outlook.com'
     
     msg = MIMEMultipart('alternative')
-    msg['Subject'] = countrycode+' | Consolidated Report '+ reportdate
     msg['From'] = fromaddr
     msg['To'] = toaddr
     msg['CC'] = ccaddr
     toaddrs = [toaddr] + ccaddr.split(',')
     
     if not consolfile == None:
+        msg['Subject'] = countrycode+' | Consolidated Report '+ reportdate
+        
         text = 'Hi Team,\n\nKindly refer attachment above for '+countrycode+' Release Report on '+reportdate+'.'+'\n\n'+\
         'If you have any enquiry, please do not hesitate to contact us at '+fromaddr+'.\n\nThank you.'
         
@@ -106,6 +107,8 @@ def sendconso(fromaddr, toaddr, ccaddr, consolfile, countrycode):
         msg.attach(att)
         
     else:
+        msg['Subject'] = countrycode+' | Consolidated Report '+ reportdate + ' | No Release Detected'
+        
         text = 'Hi Team,\n\nFor your information, there are no '+countrycode+' release detected on '+reportdate+'.'+'\n\n'+\
         'If you have any enquiry, please do not hesitate to contact us at '+fromaddr+'.\n\nThank you.'
         
@@ -128,5 +131,8 @@ if __name__ == '__main__':
     consolfile2 = consolidatereport(masterfolder, 'MAC', ['1', '2'])
     sendconso(fromadd, toadd, ccadd, consolfile2, 'MAC')
     
-    os.remove(consolfile1)
-    os.remove(consolfile2)
+    for i in (consolfile1, consolfile2):
+        if not i == None:
+            os.remove(i)
+        else:
+            pass
