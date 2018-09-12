@@ -118,9 +118,9 @@ def sendconso(fromaddr, toaddr, ccaddr, consolfile, countrycode):
 
 if __name__ == '__main__':
     masterfolder = dirname(abspath(__file__))
-    fromadd = 'zmohamadazri@isimarkets.com'
-    toadd = 'zmohamadazri@isimarkets.com'
-    ccadd = 'zmohamadazri@isimarkets.com, zmohamadazri@isimarkets.com'
+    fromadd = 'youremail@lala.com'
+    toadd = 'youremail@lala.com'
+    ccadd = 'youremail@lala.com, youremail@lala.com'
     
     consolfile1 = consolidatereport(masterfolder, 'HKG', ['1', '2'])
     sendconso(fromadd, toadd, ccadd, consolfile1, 'HKG')
