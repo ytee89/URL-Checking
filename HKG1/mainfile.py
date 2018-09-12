@@ -29,7 +29,7 @@ def run_url_checking(masterfile):
     excel2 = join(masterfolder, "Report.xlsx")
     excel3 = join(masterfolder, "Email.xlsx")
     htmlfile = join(masterfolder, "Email.html")
-#    mdbfile = join(masterfolder, "Automation.mdb")
+    mdbfile = join(masterfolder, "Automation.mdb")
 
     #convert masterfile to dataframe
     df1 = pd.read_excel(excel1, sheet_name='Sheet1')
@@ -76,7 +76,7 @@ def run_url_checking(masterfile):
                 c.failed('Elements not found')
             elif df1.loc[i, 'Current TimePoint'] != df1.loc[i, 'TimePoint Source']:
                 c.updatedetected()
-#                c.updatemdb(mdbfile, countrycode)
+                c.updatemdb(mdbfile, countrycode)
             else:
                 c.uptodate()
                
