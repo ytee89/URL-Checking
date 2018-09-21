@@ -36,8 +36,12 @@ def consolidatereport(masterfolder, countrycode, no):
         df3.sort_values(['Requested Time'], ascending=0, inplace=True)  
         df3['Requested Time'] = df3['Requested Time'].dt.strftime('%d-%m-%Y %I:%M:%S %p')
         
-        consolexcel = join(join(masterfolder, countrycode + ' Consolidated Report'), countrycode + ' Consolidated Report ' +
-                           reportdate + '.xlsx')
+        consolidatefolder = join(masterfolder, countrycode + ' Consolidated Report')
+        if not exists(consolidatefolder):
+            os.makedirs(consolidatefolder)
+        else:
+            pass
+        consolexcel = join(consolidatefolder , countrycode + ' Consolidated Report ' + reportdate + '.xlsx')
         
         wb = openpyxl.Workbook(consolexcel)
         wb.save(consolexcel)
