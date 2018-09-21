@@ -4,7 +4,8 @@ Created on Wed Jul 11 10:38:13 2018
 
 @author: zmohamadazri
 """
-from os.path import join, dirname, abspath
+import os
+from os.path import join, dirname, abspath, exists
 import pandas as pd
 from requests.exceptions import HTTPError, ConnectionError, ReadTimeout
 from selenium.common.exceptions import TimeoutException, WebDriverException
@@ -49,7 +50,13 @@ def run_url_checking(masterfile):
     toaddress = str(df12.loc['To'].get(1)).strip()
     ccaddress = str(df12.loc['CC'].get(1)).strip()
     countrycode = str(df12.loc['Country Code'].get(1)).strip()
-    excel4 = join(join(masterfolder, 'Consolidated Report'), countrycode+' Consolidated Report.xlsx')
+    
+    consolfolder = join(masterfolder, 'Consolidated Report')
+    if not exists(consolfolder):
+        os.makedirs(consolfolder)
+    else:
+        pass
+    excel4 = join(consolfolder, countrycode+' Consolidated Report.xlsx')
     
     #open selenium webdriver
     driver = urlaccess.openwebdriver()
