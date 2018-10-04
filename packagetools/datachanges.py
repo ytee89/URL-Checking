@@ -85,7 +85,7 @@ class CheckingResult(object):
             keyseries = 'FALSE'
             
         cursor.execute("INSERT INTO automation (country, publication, source_id, key_dataset, triggered_by, requested_time) VALUES ('"+
-                       countrycode+"', '"+self.df1.loc[self.i, 'STP Name']+"', '"+str(self.df1.loc[self.i, 'System ID'])+"', "+
+                       countrycode+"', '"+self.df1.loc[self.i, 'STP Name']+"', '"+str(self.df1.loc[self.i, 'Source ID'])+"', "+
                        keyseries +", 'RC', #"+datetime.datetime.now().strftime("%Y-%b-%d  %H:%M:%S")+"#);")
         
         cursor.close()
