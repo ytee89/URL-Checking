@@ -125,7 +125,7 @@ def sendconso(fromaddr, toaddr, ccaddr, consolfile, countrycode):
     server.quit()
  
 def sendall(*args):
-    fromadd = 'zmohamadazri@isimarkets.com'
+    fromadd = 'youremail@lala.com'
     for i in args:
         consfile = consolidatereport(i['Country'], i['No'])
         sendconso(fromadd,i['To'],i['CC'],consfile,i['Country'])
@@ -134,8 +134,8 @@ def sendall(*args):
             os.remove(consfile)
 
 if __name__ == '__main__':
-    toadd = 'zmohamadazri@isimarkets.com'
-    ccadd = 'zmohamadazri@isimarkets.com, zmohamadazri@isimarkets.com'
+    toadd = 'youremail@lala.com'
+    ccadd = 'youremail@lala.com, youremail@lala.com'
     
     sendall({'Country':'HKG', 'No':['1','2'], 'To':toadd, 'CC':ccadd},
               {'Country':'MAC', 'No':['1','2'], 'To':toadd, 'CC':ccadd},
