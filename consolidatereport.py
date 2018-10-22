@@ -16,8 +16,9 @@ import email.mime.application
 import datetime
 
 #parentfolder = abspath(join(masterfolder, os.pardir))
+masterfolder = dirname(abspath(__file__))
 
-def consolidatereport(masterfolder, countrycode, no):
+def consolidatereport(countrycode, no):
     reportdate = (datetime.datetime.now()-datetime.timedelta(hours=10)).strftime('%d-%b-%Y')
     
     df = []
@@ -122,21 +123,21 @@ def sendconso(fromaddr, toaddr, ccaddr, consolfile, countrycode):
     server = smtplib.SMTP(serverhost)
     server.sendmail(fromaddr, toaddrs, msg.as_string())
     server.quit()
+ 
+def sendall(*args):
+    fromadd = 'zmohamadazri@isimarkets.com'
+    for i in args:
+        consfile = consolidatereport(i['Country'], i['No'])
+        sendconso(fromadd,i['To'],i['CC'],consfile,i['Country'])
+        
+        if not consfile == None:
+            os.remove(consfile)
 
 if __name__ == '__main__':
-    masterfolder = dirname(abspath(__file__))
-    fromadd = 'youremail@lala.com'
-    toadd = 'youremail@lala.com'
-    ccadd = 'youremail@lala.com, youremail@lala.com'
+    toadd = 'zmohamadazri@isimarkets.com'
+    ccadd = 'zmohamadazri@isimarkets.com, zmohamadazri@isimarkets.com'
     
-    consolfile1 = consolidatereport(masterfolder, 'HKG', ['1', '2'])
-    sendconso(fromadd, toadd, ccadd, consolfile1, 'HKG')
-
-    consolfile2 = consolidatereport(masterfolder, 'MAC', ['1', '2'])
-    sendconso(fromadd, toadd, ccadd, consolfile2, 'MAC')
-    
-    for i in (consolfile1, consolfile2):
-        if not i == None:
-            os.remove(i)
-        else:
-            pass
+    sendall({'Country':'HKG', 'No':['1','2'], 'To':toadd, 'CC':ccadd},
+              {'Country':'MAC', 'No':['1','2'], 'To':toadd, 'CC':ccadd},
+              {'Country':'PAK', 'No':[''], 'To':toadd, 'CC':ccadd},
+              {'Country':'PHI', 'No':[''], 'To':toadd, 'CC':ccadd})
