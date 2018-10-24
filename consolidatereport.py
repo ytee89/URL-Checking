@@ -127,9 +127,10 @@ def sendconso(fromaddr, toaddr, ccaddr, consolfile, countrycode):
 def sendall(*args):
     fromadd = 'youremail@lala.com'
     timenow = (datetime.datetime.now()+datetime.timedelta(hours=8)).strftime('%I:%M %p')
+    today = (datetime.datetime.now()+datetime.timedelta(hours=8)).strftime('%A')
     
     for i in args:
-        if timenow == i['First_Report'] or timenow == i['Last_Report']:
+        if not today in i['Dont_Send_Days'] and (timenow == i['First_Report'] or timenow == i['Last_Report']):
             
             consfile = consolidatereport(i['Country'], i['No'])
             sendconso(fromadd,i['To'],i['CC'],consfile,i['Country'])
@@ -141,7 +142,11 @@ if __name__ == '__main__':
     toadd = 'youremail@lala.com'
     ccadd = 'youremail@lala.com, youremail@lala.com'
     
-    sendall({'Country':'HKG', 'No':['1','2'], 'To':toadd, 'CC':ccadd, 'First_Report':'09:00 AM', 'Last_Report':'06:00 PM'},
-              {'Country':'MAC', 'No':['1','2'], 'To':toadd, 'CC':ccadd, 'First_Report':'09:00 AM', 'Last_Report':'06:00 PM'},
-              {'Country':'PAK', 'No':[''], 'To':toadd, 'CC':ccadd, 'First_Report':'02:00 PM', 'Last_Report':'11:00 PM'},
-              {'Country':'PHI', 'No':[''], 'To':toadd, 'CC':ccadd, 'First_Report':'12:00 PM', 'Last_Report':'08:00 PM'})
+    sendall({'Country':'HKG', 'No':['1','2'], 'To':toadd, 'CC':ccadd, 'First_Report':'09:00 AM', 'Last_Report':'06:00 PM', 
+             'Dont_Send_Days':['Sunday']},
+              {'Country':'MAC', 'No':['1','2'], 'To':toadd, 'CC':ccadd, 'First_Report':'09:00 AM', 'Last_Report':'06:00 PM', 
+               'Dont_Send_Days':['Sunday']},
+              {'Country':'PAK', 'No':[''], 'To':toadd, 'CC':ccadd, 'First_Report':'02:00 PM', 'Last_Report':'11:00 PM', 
+               'Dont_Send_Days':['Sunday']},
+              {'Country':'PHI', 'No':[''], 'To':toadd, 'CC':ccadd, 'First_Report':'12:00 PM', 'Last_Report':'08:00 PM', 
+               'Dont_Send_Days':['Saturday','Sunday']})
