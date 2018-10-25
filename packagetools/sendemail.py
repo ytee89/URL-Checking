@@ -18,7 +18,7 @@ class SendEmail(object):
         self.toaddr = toaddr
         self.ccaddr = ccaddr
         
-    def sendmail(self, attachments, htmlbody, newreleases, failedreleases, allurl, subj):
+    def sendmail(self, attachments, htmlbody, newreleases, failedreleases, allurl, subj, mnts):
         msg = MIMEMultipart('alternative')
         msg['Subject'] = subj + str((datetime.datetime.now() + datetime.timedelta(hours=8)).strftime("%d-%m-%Y"))
         msg['From'] = self.fromaddr
@@ -32,7 +32,7 @@ class SendEmail(object):
         else:
             htmltable = ''
         
-        HTMLBody = "<font face = 'calibri'><font size = '3'>Next Schedule: " + str((datetime.datetime.now() + datetime.timedelta(hours=8,minutes=10)).strftime("%d %b %Y  %I:%M %p")) + "<br>" \
+        HTMLBody = "<font face = 'calibri'><font size = '3'>Next Schedule: " + str((datetime.datetime.now() + datetime.timedelta(hours=8,minutes=mnts)).strftime("%d %b %Y  %I:%M %p")) + "<br>" \
                 + "Success: " + str(allurl-failedreleases) + "/" + str(allurl) + "<br>" \
                 + "Failed: " + str(failedreleases) + "/" + str(allurl) + "<br>" \
                 + "New: "  + str(newreleases) \
