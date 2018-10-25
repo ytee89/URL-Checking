@@ -118,7 +118,7 @@ def run_url_checking(masterfile):
     
     #write and convert email excel body to html if new releases or failed and send email
     serverhost = 'ceicdata-com.mail.protection.outlook.com'
-    email = SendEmail(serverhost, fromaddress, toaddress, ccaddress)
+    email = SendEmail(serverhost, fromaddress, toaddress, ccaddress, 10)
     
     if newreleases != 0 or failedreleases != 0:
         convert.dftoreport(excel2, df2.drop(['Requested Time'], axis=1))#convert dataframe to excel report attachment
