@@ -18,8 +18,7 @@ import datetime
 #parentfolder = abspath(join(masterfolder, os.pardir))
 masterfolder = dirname(abspath(__file__))
 
-def consolidatereport(countrycode, no):
-    reportdate = (datetime.datetime.now()-datetime.timedelta(hours=10)).strftime('%d-%b-%Y')
+def consolidatereport(countrycode, no, reportdate):
     
     df = []
     for i in no:
@@ -86,8 +85,7 @@ def consolidatereport(countrycode, no):
         
         return consolexcel
 
-def sendconso(fromaddr, toaddr, ccaddr, consolfile, countrycode):
-    reportdate = (datetime.datetime.now()-datetime.timedelta(hours=10)).strftime('%d-%b-%Y')
+def sendconso(fromaddr, toaddr, ccaddr, consolfile, countrycode, reportdate):
     serverhost = 'ceicdata-com.mail.protection.outlook.com'
     
     msg = MIMEMultipart('alternative')
@@ -128,12 +126,18 @@ def sendall(*args):
     fromadd = 'youremail@lala.com'
     timenow = (datetime.datetime.now()+datetime.timedelta(hours=8)).strftime('%I:%M %p')
     today = (datetime.datetime.now()+datetime.timedelta(hours=8)).strftime('%A')
+    reportsdate = datetime.datetime.now()-datetime.timedelta(hours=10)
     
     for i in args:
         if not today in i['Dont_Send_Days'] and (timenow == i['First_Report'] or timenow == i['Last_Report']):
             
-            consfile = consolidatereport(i['Country'], i['No'])
-            sendconso(fromadd,i['To'],i['CC'],consfile,i['Country'])
+            if i['First_Day']+' '+i['First_Report'] != today+' '+timenow:
+                consfile = consolidatereport(i['Country'], i['No'], reportsdate.strftime('%d-%b-%Y'))
+                sendconso(fromadd,i['To'],i['CC'],consfile,i['Country'], reportsdate.strftime('%d-%b-%Y'))
+                
+            else:
+                consfile = consolidatereport(i['Country'], i['No'], (reportsdate-datetime.timedelta(days=i['Lag'])).strftime('%d-%b-%Y'))
+                sendconso(fromadd,i['To'],i['CC'],consfile,i['Country'], (reportsdate-datetime.timedelta(days=i['Lag'])).strftime('%d-%b-%Y'))
 
             if not consfile == None:
                 os.remove(consfile)
@@ -143,10 +147,10 @@ if __name__ == '__main__':
     ccadd = 'youremail@lala.com, youremail@lala.com'
     
     sendall({'Country':'HKG', 'No':['1','2'], 'To':toadd, 'CC':ccadd, 'First_Report':'09:00 AM', 'Last_Report':'06:00 PM', 
-             'Dont_Send_Days':['Sunday']},
+             'Dont_Send_Days':['Sunday'], 'First_Day':'Monday', 'Lag':1},
               {'Country':'MAC', 'No':['1','2'], 'To':toadd, 'CC':ccadd, 'First_Report':'09:00 AM', 'Last_Report':'06:00 PM', 
-               'Dont_Send_Days':['Sunday']},
+               'Dont_Send_Days':['Sunday'], 'First_Day':'Monday', 'Lag':1},
               {'Country':'PAK', 'No':[''], 'To':toadd, 'CC':ccadd, 'First_Report':'02:00 PM', 'Last_Report':'11:00 PM', 
-               'Dont_Send_Days':['Sunday']},
+               'Dont_Send_Days':['Sunday'], 'First_Day':'Monday', 'Lag':1},
               {'Country':'PHI', 'No':[''], 'To':toadd, 'CC':ccadd, 'First_Report':'12:00 PM', 'Last_Report':'08:00 PM', 
-               'Dont_Send_Days':['Saturday','Sunday']})
+               'Dont_Send_Days':['Saturday','Sunday'], 'First_Day':'Monday', 'Lag':2})
