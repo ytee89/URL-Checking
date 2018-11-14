@@ -124,21 +124,27 @@ def sendconso(fromaddr, toaddr, ccaddr, consolfile, countrycode, reportdate):
  
 def sendall(*args):
     fromadd = 'youremail@lala.com'
-    timenow = (datetime.datetime.now()+datetime.timedelta(hours=8)).strftime('%I:%M %p')
+    timenow = (datetime.datetime.now()+datetime.timedelta(hours=8)).strftime('%I %p')
     today = (datetime.datetime.now()+datetime.timedelta(hours=8)).strftime('%A')
-    reportsdate = datetime.datetime.now()-datetime.timedelta(hours=10)
+    reportsdate = datetime.datetime.now()+datetime.timedelta(hours=8)
     
     for i in args:
         if not today in i['Dont_Send_Days'] and (timenow == i['First_Report'] or timenow == i['Last_Report']):
             
             if i['First_Day']+' '+i['First_Report'] != today+' '+timenow:
-                consfile = consolidatereport(i['Country'], i['No'], reportsdate.strftime('%d-%b-%Y'))
-                sendconso(fromadd,i['To'],i['CC'],consfile,i['Country'], reportsdate.strftime('%d-%b-%Y'))
+                
+                if timenow == i['First_Report']:
+                    consfile = consolidatereport(i['Country'], i['No'], (reportsdate+datetime.timedelta(days=i['First_Rpt_Lag'])).strftime('%d-%b-%Y'))
+                    sendconso(fromadd,i['To'],i['CC'],consfile,i['Country'], (reportsdate+datetime.timedelta(days=i['First_Rpt_Lag'])).strftime('%d-%b-%Y'))
+                   
+                elif timenow == i['Last_Report']:
+                    consfile = consolidatereport(i['Country'], i['No'], (reportsdate+datetime.timedelta(days=i['Last_Rpt_Lag'])).strftime('%d-%b-%Y'))
+                    sendconso(fromadd,i['To'],i['CC'],consfile,i['Country'], (reportsdate+datetime.timedelta(days=i['Last_Rpt_Lag'])).strftime('%d-%b-%Y'))
                 
             else:
-                consfile = consolidatereport(i['Country'], i['No'], (reportsdate-datetime.timedelta(days=i['Lag'])).strftime('%d-%b-%Y'))
-                sendconso(fromadd,i['To'],i['CC'],consfile,i['Country'], (reportsdate-datetime.timedelta(days=i['Lag'])).strftime('%d-%b-%Y'))
-
+                consfile = consolidatereport(i['Country'], i['No'], (reportsdate-datetime.timedelta(days=len(i['Dont_Send_Days']))).strftime('%d-%b-%Y'))
+                sendconso(fromadd,i['To'],i['CC'],consfile,i['Country'], (reportsdate-datetime.timedelta(days=len(i['Dont_Send_Days']))).strftime('%d-%b-%Y'))
+                
             if not consfile == None:
                 os.remove(consfile)
 
@@ -146,11 +152,11 @@ if __name__ == '__main__':
     toadd = 'youremail@lala.com'
     ccadd = 'youremail@lala.com, youremail@lala.com'
     
-    sendall({'Country':'HKG', 'No':['1','2'], 'To':toadd, 'CC':ccadd, 'First_Report':'09:00 AM', 'Last_Report':'06:00 PM', 
-             'Dont_Send_Days':['Sunday'], 'First_Day':'Monday', 'Lag':1},
-              {'Country':'MAC', 'No':['1','2'], 'To':toadd, 'CC':ccadd, 'First_Report':'09:00 AM', 'Last_Report':'06:00 PM', 
-               'Dont_Send_Days':['Sunday'], 'First_Day':'Monday', 'Lag':1},
-              {'Country':'PAK', 'No':[''], 'To':toadd, 'CC':ccadd, 'First_Report':'02:00 PM', 'Last_Report':'11:00 PM', 
-               'Dont_Send_Days':['Sunday'], 'First_Day':'Monday', 'Lag':1},
-              {'Country':'PHI', 'No':[''], 'To':toadd, 'CC':ccadd, 'First_Report':'12:00 PM', 'Last_Report':'08:00 PM', 
-               'Dont_Send_Days':['Saturday','Sunday'], 'First_Day':'Monday', 'Lag':2})
+    sendall({'Country':'HKG', 'No':['1','2'], 'To':toadd, 'CC':ccadd, 'First_Report':'09 AM', 'Last_Report':'06 PM', 
+             'Dont_Send_Days':['Sunday'], 'First_Day':'Monday', 'First_Rpt_Lag':-1, 'Last_Rpt_Lag':0},
+              {'Country':'MAC', 'No':['1','2'], 'To':toadd, 'CC':ccadd, 'First_Report':'09 AM', 'Last_Report':'06 PM', 
+               'Dont_Send_Days':['Sunday'], 'First_Day':'Monday', 'First_Rpt_Lag':-1, 'Last_Rpt_Lag':0},
+              {'Country':'PAK', 'No':[''], 'To':toadd, 'CC':ccadd, 'First_Report':'02 PM', 'Last_Report':'11 PM', 
+               'Dont_Send_Days':['Sunday'], 'First_Day':'Monday', 'First_Rpt_Lag':0, 'Last_Rpt_Lag':0},
+              {'Country':'PHI', 'No':[''], 'To':toadd, 'CC':ccadd, 'First_Report':'12 PM', 'Last_Report':'08 PM', 
+               'Dont_Send_Days':['Saturday','Sunday'], 'First_Day':'Monday', 'First_Rpt_Lag':0, 'Last_Rpt_Lag':0})
