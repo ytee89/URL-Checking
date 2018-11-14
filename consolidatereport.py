@@ -142,8 +142,8 @@ def sendall(*args):
                     sendconso(fromadd,i['To'],i['CC'],consfile,i['Country'], (reportsdate+datetime.timedelta(days=i['Last_Rpt_Lag'])).strftime('%d-%b-%Y'))
                 
             else:
-                consfile = consolidatereport(i['Country'], i['No'], (reportsdate-datetime.timedelta(days=len(i['Dont_Send_Days']))).strftime('%d-%b-%Y'))
-                sendconso(fromadd,i['To'],i['CC'],consfile,i['Country'], (reportsdate-datetime.timedelta(days=len(i['Dont_Send_Days']))).strftime('%d-%b-%Y'))
+                consfile = consolidatereport(i['Country'], i['No'], (reportsdate-datetime.timedelta(days=len(i['Dont_Send_Days'])+1)).strftime('%d-%b-%Y'))
+                sendconso(fromadd,i['To'],i['CC'],consfile,i['Country'], (reportsdate-datetime.timedelta(days=len(i['Dont_Send_Days'])+1)).strftime('%d-%b-%Y'))
                 
             if not consfile == None:
                 os.remove(consfile)
