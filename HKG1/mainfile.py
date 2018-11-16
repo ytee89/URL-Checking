@@ -5,6 +5,7 @@ Created on Wed Jul 11 10:38:13 2018
 @author: zmohamadazri
 """
 import os
+import shutil
 from os.path import join, dirname, abspath, exists
 import pandas as pd
 from requests.exceptions import HTTPError, ConnectionError, ReadTimeout
@@ -150,3 +151,12 @@ if __name__ == "__main__":
     masterfile = "URL Checking.xlsx"
     run_url_checking(masterfile)
     
+    tempfolder = ''
+    
+    for allfiles in os.listdir(tempfolder):
+        if allfiles.startswith('scoped_dir'):
+            file_path = os.path.join(tempfolder, allfiles)
+            try:
+                shutil.rmtree(file_path)
+            except Exception as e:
+                pass
