@@ -151,7 +151,8 @@ if __name__ == "__main__":
     masterfile = "URL Checking.xlsx"
     run_url_checking(masterfile)
     
-    tempfolder = ''
+    user = os.getlogin()
+    tempfolder = 'C:\\Users\\'+ user+'\\AppData\\Local\\Temp'
     
     for allfiles in os.listdir(tempfolder):
         if allfiles.startswith('scoped_dir'):
