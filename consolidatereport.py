@@ -129,18 +129,16 @@ def sendall(*args):
     reportsdate = datetime.datetime.now()+datetime.timedelta(hours=8)
     
     for i in args:
-        if not today in i['Dont_Send_Days'] and (timenow == i['First_Report'] or timenow == i['Last_Report']):
+        if not today in i['Dont_Send_Days'] and any(timenow == x for x in i['Reports_Time']):
             
-            if i['First_Day']+' '+i['First_Report'] != today+' '+timenow:
+            if i['First_Day']+' '+i['Reports_Time'][0] != today+' '+timenow:
                 
-                if timenow == i['First_Report']:
-                    consfile = consolidatereport(i['Country'], i['No'], (reportsdate+datetime.timedelta(days=i['First_Rpt_Lag'])).strftime('%d-%b-%Y'))
-                    sendconso(fromadd,i['To'],i['CC'],consfile,i['Country'], (reportsdate+datetime.timedelta(days=i['First_Rpt_Lag'])).strftime('%d-%b-%Y'))
-                   
-                elif timenow == i['Last_Report']:
-                    consfile = consolidatereport(i['Country'], i['No'], (reportsdate+datetime.timedelta(days=i['Last_Rpt_Lag'])).strftime('%d-%b-%Y'))
-                    sendconso(fromadd,i['To'],i['CC'],consfile,i['Country'], (reportsdate+datetime.timedelta(days=i['Last_Rpt_Lag'])).strftime('%d-%b-%Y'))
-                
+                for report_time,report_lag in zip(i['Reports_Time'], i['Reports_Lag']):
+                    
+                    if timenow == report_time:
+                        consfile = consolidatereport(i['Country'], i['No'], (reportsdate+datetime.timedelta(days=report_lag)).strftime('%d-%b-%Y'))
+                        sendconso(fromadd,i['To'],i['CC'],consfile,i['Country'], (reportsdate+datetime.timedelta(days=report_lag)).strftime('%d-%b-%Y'))
+            
             else:
                 consfile = consolidatereport(i['Country'], i['No'], (reportsdate-datetime.timedelta(days=len(i['Dont_Send_Days'])+1)).strftime('%d-%b-%Y'))
                 sendconso(fromadd,i['To'],i['CC'],consfile,i['Country'], (reportsdate-datetime.timedelta(days=len(i['Dont_Send_Days'])+1)).strftime('%d-%b-%Y'))
@@ -152,11 +150,11 @@ if __name__ == '__main__':
     toadd = 'youremail@lala.com'
     ccadd = 'youremail@lala.com, youremail@lala.com'
     
-    sendall({'Country':'HKG', 'No':['1','2'], 'To':toadd, 'CC':ccadd, 'First_Report':'09 AM', 'Last_Report':'06 PM', 
-             'Dont_Send_Days':['Sunday'], 'First_Day':'Monday', 'First_Rpt_Lag':-1, 'Last_Rpt_Lag':0},
-              {'Country':'MAC', 'No':['1','2'], 'To':toadd, 'CC':ccadd, 'First_Report':'09 AM', 'Last_Report':'06 PM', 
-               'Dont_Send_Days':['Sunday'], 'First_Day':'Monday', 'First_Rpt_Lag':-1, 'Last_Rpt_Lag':0},
-              {'Country':'PAK', 'No':[''], 'To':toadd, 'CC':ccadd, 'First_Report':'02 PM', 'Last_Report':'11 PM', 
-               'Dont_Send_Days':['Sunday'], 'First_Day':'Monday', 'First_Rpt_Lag':0, 'Last_Rpt_Lag':0},
-              {'Country':'PHI', 'No':[''], 'To':toadd, 'CC':ccadd, 'First_Report':'12 PM', 'Last_Report':'08 PM', 
-               'Dont_Send_Days':['Saturday','Sunday'], 'First_Day':'Monday', 'First_Rpt_Lag':0, 'Last_Rpt_Lag':0})
+    sendall({'Country':'HKG', 'No':['1','2'], 'To':toadd, 'CC':ccadd, 'Reports_Time':['09 AM','06 PM'], 'Reports_Lag':[-1,0], 'First_Day':'Tuesday',
+             'Dont_Send_Days':['Sunday']},
+              {'Country':'MAC', 'No':['1','2'], 'To':toadd, 'CC':ccadd, 'Reports_Time':['09 AM','06 PM'], 'Reports_Lag':[-1,0], 'First_Day':'Monday',
+               'Dont_Send_Days':['Sunday']},
+              {'Country':'PAK', 'No':[''], 'To':toadd, 'CC':ccadd, 'Reports_Time':['02 PM','11 PM'], 'Reports_Lag':[0,0], 'First_Day':'Monday',
+               'Dont_Send_Days':['Sunday']},
+              {'Country':'PHI', 'No':[''], 'To':toadd, 'CC':ccadd, 'Reports_Time':['12 PM','08 PM'], 'Reports_Lag':[0,0], 'First_Day':'Monday',
+               'Dont_Send_Days':['Saturday','Sunday']})
