@@ -22,7 +22,7 @@ class SendEmail(object):
     def sendmail(self, attachments, htmlbody, newreleases, failedreleases, allurl, subj):
         msg = MIMEMultipart('alternative')
         msg['Subject'] = subj + str((datetime.datetime.now() + datetime.timedelta(hours=8)).strftime("%d-%m-%Y"))
-        msg['From'] = self.fromaddr
+        msg['From'] = 'RCTCore <RCTCore@isimarkets.com>'
         msg['To'] = self.toaddr
         msg['CC'] = self.ccaddr
         toaddrs = [self.toaddr] + self.ccaddr.split(',')
@@ -41,7 +41,7 @@ class SendEmail(object):
                 +  htmltable \
                 + "<br>" \
                 + "<font face = 'calibri'><font size = '3'>Matrix Manager's checking results are a benchmark for your further action." + "<br>" \
-                + "Please contact us at (" + self.fromaddr + ") if:" + "<br>" \
+                + "Please contact us at (RCTCore@isimarkets.com) if:" + "<br>" \
                 + "1) No email received on the time stated in 'Next Schedule' as above" + "<br>" \
                 + "2) Enhancement requests for remarks stated 'Fail - Website Layout Change/Server Down'" + "<br>" \
                 + "3) Any other enquires</font>"
