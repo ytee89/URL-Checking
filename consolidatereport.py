@@ -89,7 +89,7 @@ def sendconso(fromaddr, toaddr, ccaddr, consolfile, countrycode, reportdate):
     serverhost = 'ceicdata-com.mail.protection.outlook.com'
     
     msg = MIMEMultipart('alternative')
-    msg['From'] = fromaddr
+    msg['From'] = 'RCTCore <RCTCore@isimarkets.com>'
     msg['To'] = toaddr
     msg['CC'] = ccaddr
     toaddrs = [toaddr] + ccaddr.split(',')
@@ -113,7 +113,7 @@ def sendconso(fromaddr, toaddr, ccaddr, consolfile, countrycode, reportdate):
         msg['Subject'] = countrycode+' | Consolidated Report '+ reportdate + ' | No Release Detected'
         
         text = 'Hi Team,\n\nFor your information, there are no '+countrycode+' release detected on '+reportdate+'.'+'\n\n'+\
-        'If you have any enquiry, please do not hesitate to contact us at '+fromaddr+'.\n\nThank you.'
+        'If you have any enquiry, please do not hesitate to contact us at RCTCore@isimarkets.com.\n\nThank you.'
         
         part = MIMEText(text, 'plain')
         msg.attach(part)
