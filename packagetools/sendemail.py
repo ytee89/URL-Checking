@@ -24,8 +24,11 @@ class SendEmail(object):
         msg['Subject'] = subj + str((datetime.datetime.now() + datetime.timedelta(hours=8)).strftime("%d-%m-%Y"))
         msg['From'] = 'RCTCore <RCTCore@isimarkets.com>'
         msg['To'] = self.toaddr
-        msg['CC'] = self.ccaddr
-        toaddrs = [self.toaddr] + self.ccaddr.split(',')
+        if self.ccaddr == 'nan':
+            toaddrs = [self.toaddr]
+        else:
+            msg['CC'] = self.ccaddr
+            toaddrs = [self.toaddr] + self.ccaddr.split(',')
         
         if htmlbody != None:
             htmltable = open(htmlbody).read()
