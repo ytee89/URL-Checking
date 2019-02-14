@@ -43,10 +43,10 @@ class SendEmail(object):
                 + "</font><br>" \
                 +  htmltable \
                 + "<br>" \
-                + "<font face = 'calibri'><font size = '3'>Matrix Manager's checking results are a benchmark for your further action." + "<br>" \
+                + "<font face = 'calibri'><font size = '3'>RC Tool's checking results are a benchmark for your further action." + "<br>" \
                 + "Please contact us at (RCTCore@isimarkets.com) if:" + "<br>" \
                 + "1) No email received on the time stated in 'Next Schedule' as above" + "<br>" \
-                + "2) Enhancement requests for remarks stated 'Fail - Website Layout Change/Server Down'" + "<br>" \
+                + "2) Enhancement requests for remarks stated 'Fail - Website Layout Change/Server Down' on a recurring basis." + "<br>" \
                 + "3) Any other enquires</font>"
             
         msg.attach(MIMEText(HTMLBody, 'html'))
