@@ -69,7 +69,7 @@ def run_url_checking(masterfile):
         stpname = df1.loc[i, 'STP Name']
         ref = df1.loc[i, 'Ref']
         timepoint1 = df1.loc[i, 'Current TimePoint']
-        save_path = join(masterfolder, str(df1.loc[i, 'STP Name']) + url[url.rfind('.'):])
+        save_path = join(masterfolder, 'file')
         
         c = CheckingResult(i, df1, df2)
         
@@ -81,7 +81,7 @@ def run_url_checking(masterfile):
             
             #check whether there are a new updates or failed and make changes in the dataframe
             if df1.loc[i, 'TimePoint Source'] == '' or df1.loc[i, 'TimePoint Source'] == None:
-                c.failed('Elements not found')
+                c.failed('Fail - Website Layout Change/Server Down')
             elif df1.loc[i, 'Current TimePoint'] != df1.loc[i, 'TimePoint Source']:
                 c.updatedetected()
                 c.updatemdb(mdbfile, countrycode)
@@ -90,19 +90,19 @@ def run_url_checking(masterfile):
                
         #error handler
         except AttributeError as atterror:
-            c.failed('Elements not found')
+            c.failed('Fail - Website Layout Change/Server Down')
         except NameError as namerror:
-            c.failed('Elements not found')
+            c.failed('Fail - Website Layout Change/Server Down')
         except HTTPError as htterror:
-            c.failed('Page not found')
+            c.failed('Fail - Website Layout Change/Server Down')
         except ConnectionError as conerror:
-            c.failed('Connection error')
+            c.failed('Fail - Connection unstable')
         except ReadTimeout as rdtimeout:
-            c.failed('Server down')
+            c.failed('Fail - Website Layout Change/Server Down')
         except TimeoutException as timeoutexc:
-            c.failed('Loading timeout')
+            c.failed('Fail - Connection unstable')
         except WebDriverException as wbdrvexc:
-            c.failed('Webdriver error')
+            c.failed('Fail - Website Layout Change/Server Down')
             
         print(str(i+1)+' '+str(df1.loc[i,'STP Name'])+'\n'+str(df1.loc[i,'Changes Type'])+'\n')
     
