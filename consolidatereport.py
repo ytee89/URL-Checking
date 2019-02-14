@@ -18,6 +18,38 @@ import datetime
 #parentfolder = abspath(join(masterfolder, os.pardir))
 masterfolder = dirname(abspath(__file__))
 
+def mainfile(countrycode, no):
+    df = []
+    for i in no:
+        excel1 = join(join(masterfolder,countrycode+i), 'URL Checking.xlsx')
+        
+        if exists(excel1):
+            df.append(pd.read_excel(excel1))
+        else:
+            pass
+        
+    dfmasterfile = pd.concat(df,sort=False)
+    
+    allmasterfilefolder = join(masterfolder, 'All Master Files')
+    if not exists(allmasterfilefolder):
+        os.makedirs(allmasterfilefolder)
+    else:
+        pass
+    
+    masterfiles = join(allmasterfilefolder, countrycode + ' URL Checking.xlsx')
+    
+    wb = openpyxl.Workbook(masterfiles)
+    wb.save(masterfiles)
+    wb1 = openpyxl.load_workbook(masterfiles)
+    
+    writer = pd.ExcelWriter(masterfiles,engine='openpyxl')
+    writer.book = wb1
+    writer.sheets = dict((ws.title,ws) for ws in wb1.worksheets)
+    dfmasterfile.to_excel(writer,sheet_name='Sheet',index=False)
+    writer.save()
+    
+    return masterfiles
+
 def consolidatereport(countrycode, no, reportdate):
     
     df = []
@@ -85,7 +117,7 @@ def consolidatereport(countrycode, no, reportdate):
         
         return consolexcel
 
-def sendconso(fromaddr, toaddr, ccaddr, consolfile, countrycode, reportdate):
+def sendconso(fromaddr, toaddr, ccaddr, consolfile, countrycode, reportdate, masterfile):
     serverhost = 'ceicdata-com.mail.protection.outlook.com'
     
     msg = MIMEMultipart('alternative')
@@ -118,6 +150,12 @@ def sendconso(fromaddr, toaddr, ccaddr, consolfile, countrycode, reportdate):
         part = MIMEText(text, 'plain')
         msg.attach(part)
         
+    fp=open(masterfile,'rb')
+    attm = email.mime.application.MIMEApplication(fp.read(),_subtype="xlsx")
+    fp.close()
+    attm.add_header('Content-Disposition','attachment',filename=masterfile[masterfile.rfind('\\'):])
+    msg.attach(attm)
+    
     server = smtplib.SMTP(serverhost)
     server.sendmail(fromaddr, toaddrs, msg.as_string())
     server.quit()
@@ -137,11 +175,13 @@ def sendall(*args):
                     
                     if timenow == report_time:
                         consfile = consolidatereport(i['Country'], i['No'], (reportsdate+datetime.timedelta(days=report_lag)).strftime('%d-%b-%Y'))
-                        sendconso(fromadd,i['To'],i['CC'],consfile,i['Country'], (reportsdate+datetime.timedelta(days=report_lag)).strftime('%d-%b-%Y'))
+                        mtrfile = mainfile(i['Country'], i['No'])
+                        sendconso(fromadd,i['To'],i['CC'],consfile,i['Country'], (reportsdate+datetime.timedelta(days=report_lag)).strftime('%d-%b-%Y'), mtrfile)
             
             else:
                 consfile = consolidatereport(i['Country'], i['No'], (reportsdate-datetime.timedelta(days=len(i['Dont_Send_Days'])+1)).strftime('%d-%b-%Y'))
-                sendconso(fromadd,i['To'],i['CC'],consfile,i['Country'], (reportsdate-datetime.timedelta(days=len(i['Dont_Send_Days'])+1)).strftime('%d-%b-%Y'))
+                mtrfile = mainfile(i['Country'], i['No'])
+                sendconso(fromadd,i['To'],i['CC'],consfile,i['Country'], (reportsdate-datetime.timedelta(days=len(i['Dont_Send_Days'])+1)).strftime('%d-%b-%Y'), mtrfile)
                 
             if not consfile == None:
                 os.remove(consfile)
