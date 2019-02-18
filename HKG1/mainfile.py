@@ -89,19 +89,21 @@ def run_url_checking(masterfile):
                 c.uptodate()
                
         #error handler
-        except AttributeError as atterror:
+        except AttributeError:
             c.failed('Fail - Website Layout Change/Server Down')
-        except NameError as namerror:
+        except NameError:
             c.failed('Fail - Website Layout Change/Server Down')
-        except HTTPError as htterror:
+        except HTTPError:
             c.failed('Fail - Website Layout Change/Server Down')
-        except ConnectionError as conerror:
+        except ConnectionError:
             c.failed('Fail - Connection unstable')
-        except ReadTimeout as rdtimeout:
+        except ReadTimeout:
             c.failed('Fail - Website Layout Change/Server Down')
-        except TimeoutException as timeoutexc:
+        except TimeoutException:
             c.failed('Fail - Connection unstable')
-        except WebDriverException as wbdrvexc:
+        except WebDriverException:
+            c.failed('Fail - Website Layout Change/Server Down')
+        except Exception:
             c.failed('Fail - Website Layout Change/Server Down')
             
         print(str(i+1)+' '+str(df1.loc[i,'STP Name'])+'\n'+str(df1.loc[i,'Changes Type'])+'\n')
