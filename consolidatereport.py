@@ -28,9 +28,16 @@ def mainfile(countrycode, no):
         else:
             pass
         
-    dfmasterfile = pd.concat(df,sort=False)
+    dfmasterfile = pd.concat(df)#,sort=False)
+    dfmasterfile = dfmasterfile[['Source','Real URL','URL','STP Name','Key Series','Frequency',
+                                 'Level','System ID','Update Method','Remark']]
+    
+    dfmasterfile = dfmasterfile.rename(columns={'Real URL':'URL1','URL':'URL2_MacroPurpose','STP Name':'STP_Name',
+                                                'Key Series':'Key_Status','Level':'Edge_Level','System ID':'System_ID',
+                                                'Update Method':'Update_Method'})
     
     allmasterfilefolder = join(masterfolder, 'All Master Files')
+    
     if not exists(allmasterfilefolder):
         os.makedirs(allmasterfilefolder)
     else:
@@ -41,7 +48,11 @@ def mainfile(countrycode, no):
     wb = openpyxl.Workbook(masterfiles)
     wb.save(masterfiles)
     wb1 = openpyxl.load_workbook(masterfiles)
+    sheet1 = wb1['Sheet']
     
+    for dim1 in [['A',7],['B',20],['C',20],['D',40],['E',11],['F',15],['G',11],['H',10],['I',16],['J',25]]:
+        sheet1.column_dimensions[dim1[0]].width = dim1[1]
+        
     writer = pd.ExcelWriter(masterfiles,engine='openpyxl')
     writer.book = wb1
     writer.sheets = dict((ws.title,ws) for ws in wb1.worksheets)
@@ -51,7 +62,6 @@ def mainfile(countrycode, no):
     return masterfiles
 
 def consolidatereport(countrycode, no, reportdate):
-    
     df = []
     for i in no:
         excel1 = join(join(masterfolder,countrycode +i+'\\Consolidated Report'),countrycode + ' Consolidated Report.xlsx')
@@ -69,10 +79,12 @@ def consolidatereport(countrycode, no, reportdate):
         df3['Requested Time'] = df3['Requested Time'].dt.strftime('%d-%m-%Y %I:%M:%S %p')
         
         consolidatefolder = join(masterfolder, countrycode + ' Consolidated Report')
+        
         if not exists(consolidatefolder):
             os.makedirs(consolidatefolder)
         else:
             pass
+        
         consolexcel = join(consolidatefolder , countrycode + ' Consolidated Report ' + reportdate + '.xlsx')
         
         wb = openpyxl.Workbook(consolexcel)
@@ -121,6 +133,7 @@ def sendconso(fromaddr, toaddr, ccaddr, consolfile, countrycode, reportdate, mas
     serverhost = 'ceicdata-com.mail.protection.outlook.com'
     
     msg = MIMEMultipart('alternative')
+    
     msg['From'] = 'RCTCore <RCTCore@isimarkets.com>'
     msg['To'] = toaddr
     msg['CC'] = ccaddr
