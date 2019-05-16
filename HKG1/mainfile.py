@@ -40,6 +40,7 @@ def run_url_checking(masterfile):
     #create dataframe for use in report attachment
     df2 = pd.DataFrame(columns=['Source','STP Name', 'New Timepoint','Previous Timepoint', 'Changes Type', 
                                 'Key', 'Frequency', 'Level', 'System ID', 'Method', 'Remark', 'Requested Time'])
+    df2m = pd.DataFrame(columns=['Source','STP Name', 'Changes Type', 'Key', 'Frequency', 'Level', 'System ID', 'Method', 'Remark', 'Requested Time'])
     
     #clear columns value on the masterfile
     df1['TimePoint Source'] = None
@@ -58,6 +59,7 @@ def run_url_checking(masterfile):
     else:
         pass
     excel4 = join(consolfolder, countrycode+' Consolidated Report.xlsx')
+    mdbRCfile = join(masterfolder, countrycode+'ConsolidatedReport.mdb')
     
     #open selenium webdriver
     driver = urlaccess.openwebdriver()
@@ -71,7 +73,7 @@ def run_url_checking(masterfile):
         timepoint1 = df1.loc[i, 'Current TimePoint']
         save_path = join(masterfolder, 'file')
         
-        c = CheckingResult(i, df1, df2)
+        c = CheckingResult(i, df1, df2, df2m)
         
         try:
             #check the latest timepoint
@@ -84,7 +86,9 @@ def run_url_checking(masterfile):
                 c.failed('Fail - Website Layout Change/Server Down')
             elif df1.loc[i, 'Current TimePoint'] != df1.loc[i, 'TimePoint Source']:
                 c.updatedetected()
-                c.updatemdb(mdbfile, countrycode)
+                c.updatemdbRC(mdbRCfile)
+                if 'Macro' in str(df1.loc[i, 'Update Method']): 
+                    c.updatemdb(mdbfile, countrycode)
             else:
                 c.uptodate()
                
@@ -114,6 +118,7 @@ def run_url_checking(masterfile):
     #count number of url, new releases, and failed
     newreleases = len(df1[df1['Changes Type'] == 'New Detected'])
     failedreleases = len(df1[df1['Changes Type'] != 'Up to date']) - len(df1[df1['Changes Type'] == 'New Detected'])
+    manualreleases = len(df2m)    
     allurl = len(df1)
     
     #convert dataframe back to excel masterfile
@@ -124,20 +129,24 @@ def run_url_checking(masterfile):
     email = SendEmail(serverhost, fromaddress, toaddress, ccaddress, 10)
     
     if newreleases != 0 or failedreleases != 0:
-        convert.dftoreport(excel2, df2.drop(['Requested Time'], axis=1))#convert dataframe to excel report attachment
+        convert.dftoreport(excel2, df2.drop(['Requested Time'], axis=1), df2m.drop(['Requested Time'], axis=1))#convert dataframe to excel report attachment
         ec = ExcelChanges(excel2, excel3, df1)
         ec.reporttoemail()#write email body in excel
         convert.exceltohtml(excel3, htmlfile)#convert excel email body to html
         
         if newreleases != 0:
-            email.sendmail(excel2, htmlfile, newreleases, failedreleases, allurl, 'Alert! | '+countrycode+'_Release Detected_')
-            consolidate(df2, excel4)
+            email.sendmail(excel2, htmlfile, newreleases, failedreleases, manualreleases, allurl, 'Alert! | '+countrycode+'_Release Detected_')
+            consolidate(df2, df2m, excel4)
+        elif failedreleases > manualreleases:
+            email.sendmail(excel2, htmlfile, newreleases, failedreleases, manualreleases, allurl, 'Failed | '+countrycode+'_No Release Detected_')            
         else:
-            email.sendmail(excel2, htmlfile, newreleases, failedreleases, allurl, 'Failed | '+countrycode+'_No Release Detected_')
+            htmlfile = None
+            consolidate(df2, df2m, excel4)
+            email.sendmail(excel2, htmlfile, newreleases, failedreleases, manualreleases, allurl, 'Failed | '+countrycode+'_No Release Detected_')
         
     else:
         htmlfile = None
-        email.sendmail(excel2, htmlfile, newreleases, failedreleases, allurl, 'All Up To Date | '+countrycode+'_No Release Detected_')
+        email.sendmail(excel2, htmlfile, newreleases, failedreleases, manualreleases, allurl, 'All Up To Date | '+countrycode+'_No Release Detected_')
     
     #remove report attachment, excel and html email body
     urlaccess.deletefile(excel2)
