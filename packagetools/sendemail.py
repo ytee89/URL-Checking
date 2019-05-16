@@ -19,7 +19,7 @@ class SendEmail(object):
         self.ccaddr = ccaddr
         self.mnts = mnts
         
-    def sendmail(self, attachments, htmlbody, newreleases, failedreleases, allurl, subj):
+    def sendmail(self, attachments, htmlbody, newreleases, failedreleases, manualreleases, allurl, subj):
         msg = MIMEMultipart('alternative')
         msg['Subject'] = subj + str((datetime.datetime.now() + datetime.timedelta(hours=8)).strftime("%d-%m-%Y"))
         msg['From'] = 'RCTCore <RCTCore@isimarkets.com>'
@@ -39,7 +39,8 @@ class SendEmail(object):
         HTMLBody = "<font face = 'calibri'><font size = '3'>Next Schedule: " + str((datetime.datetime.now() + datetime.timedelta(hours=8,minutes=self.mnts)).strftime("%d %b %Y  %I:%M %p")) + "<br>" \
                 + "Success: " + str(allurl-failedreleases) + "/" + str(allurl) + "<br>" \
                 + "Failed: " + str(failedreleases) + "/" + str(allurl) + "<br>" \
-                + "New: "  + str(newreleases) \
+                + "New: "  + str(newreleases) + "<br>" \
+                + "Manual: " + str(manualreleases) \
                 + "</font><br>" \
                 +  htmltable \
                 + "<br>" \
